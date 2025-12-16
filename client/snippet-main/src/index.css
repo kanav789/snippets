@@ -1,0 +1,258 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=VT323&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 120 10% 4%;
+    --foreground: 120 100% 65%;
+
+    --card: 120 10% 6%;
+    --card-foreground: 120 100% 65%;
+
+    --popover: 120 10% 6%;
+    --popover-foreground: 120 100% 65%;
+
+    --primary: 120 100% 50%;
+    --primary-foreground: 120 10% 4%;
+
+    --secondary: 120 15% 10%;
+    --secondary-foreground: 120 100% 65%;
+
+    --muted: 120 10% 12%;
+    --muted-foreground: 120 50% 40%;
+
+    --accent: 120 100% 50%;
+    --accent-foreground: 120 10% 4%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 120 40% 20%;
+    --input: 120 15% 10%;
+    --ring: 120 100% 50%;
+
+    --radius: 0;
+
+    /* Terminal custom tokens */
+    --terminal-glow: 0 0 10px hsl(120 100% 50% / 0.5), 0 0 20px hsl(120 100% 50% / 0.3), 0 0 40px hsl(120 100% 50% / 0.1);
+    --terminal-text-glow: 0 0 8px hsl(120 100% 50% / 0.8);
+    --scanline-opacity: 0.03;
+  }
+
+  .dark {
+    --background: 120 10% 4%;
+    --foreground: 120 100% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-mono antialiased;
+    font-family: 'Fira Code', monospace;
+  }
+
+  ::selection {
+    background: hsl(120 100% 50% / 0.3);
+    color: hsl(120 100% 75%);
+  }
+}
+
+/* Scanline effect */
+.terminal-screen::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    hsl(120 100% 50% / var(--scanline-opacity)) 2px,
+    hsl(120 100% 50% / var(--scanline-opacity)) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* CRT flicker effect */
+.terminal-screen::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, hsl(120 10% 4% / 0.2) 100%);
+  pointer-events: none;
+  z-index: 999;
+}
+
+@layer components {
+  .terminal-window {
+    @apply bg-card border border-border;
+    box-shadow: var(--terminal-glow);
+  }
+
+  .terminal-header {
+    @apply flex items-center gap-2 px-4 py-2 border-b border-border bg-secondary/50;
+  }
+
+  .terminal-dot {
+    @apply w-3 h-3 rounded-full;
+  }
+
+  .terminal-title {
+    @apply text-sm text-muted-foreground ml-2;
+  }
+
+  .terminal-body {
+    @apply p-4;
+  }
+
+  .glow-text {
+    text-shadow: var(--terminal-text-glow);
+  }
+
+  .terminal-prompt::before {
+    content: '> ';
+    @apply text-primary;
+  }
+
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .terminal-input {
+    @apply w-full bg-transparent border-none outline-none text-foreground placeholder:text-muted-foreground;
+    caret-color: hsl(120 100% 50%);
+  }
+
+  .terminal-input:focus {
+    @apply outline-none ring-0;
+  }
+
+  .terminal-card {
+    @apply bg-card border border-border p-4 transition-all duration-200;
+  }
+
+  .terminal-card:hover {
+    @apply border-primary/50;
+    box-shadow: var(--terminal-glow);
+  }
+
+  .terminal-btn {
+    @apply px-4 py-2 bg-primary text-primary-foreground font-mono font-bold uppercase tracking-wider;
+    @apply border-2 border-primary;
+    @apply transition-all duration-200;
+    @apply hover:bg-transparent hover:text-primary;
+    @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-primary disabled:hover:text-primary-foreground;
+  }
+
+  .terminal-btn-ghost {
+    @apply px-4 py-2 bg-transparent text-foreground font-mono;
+    @apply border border-border;
+    @apply transition-all duration-200;
+    @apply hover:border-primary hover:text-primary;
+  }
+
+  .terminal-input-field {
+    @apply w-full px-4 py-3 bg-secondary/30 border border-border;
+    @apply text-foreground placeholder:text-muted-foreground font-mono;
+    @apply focus:outline-none focus:border-primary focus:ring-0;
+    @apply transition-all duration-200;
+  }
+
+  .terminal-textarea {
+    @apply w-full px-4 py-3 bg-secondary/30 border border-border resize-y;
+    @apply text-foreground placeholder:text-muted-foreground font-mono text-sm;
+    @apply focus:outline-none focus:border-primary focus:ring-0;
+    @apply transition-all duration-200;
+  }
+
+  .ascii-header {
+    font-family: 'Fira Code', monospace;
+    @apply text-primary glow-text whitespace-pre;
+  }
+
+  .command-line {
+    @apply flex items-center gap-2 text-foreground;
+  }
+
+  .command-line::before {
+    content: '$';
+    @apply text-primary font-bold;
+  }
+
+  .output-text {
+    @apply text-muted-foreground text-sm pl-4 border-l border-border;
+  }
+
+  .status-bar {
+    @apply fixed bottom-0 left-0 right-0 px-4 py-2 bg-secondary border-t border-border;
+    @apply flex items-center justify-between text-xs text-muted-foreground;
+  }
+
+  .tag {
+    @apply inline-block px-2 py-0.5 text-xs border border-primary/50 text-primary bg-primary/10;
+  }
+}
+
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
+  .animate-type {
+    animation: typing 0.5s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes typing {
+    from {
+      opacity: 0;
+      transform: translateX(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .stagger-1 { animation-delay: 0.1s; }
+  .stagger-2 { animation-delay: 0.2s; }
+  .stagger-3 { animation-delay: 0.3s; }
+  .stagger-4 { animation-delay: 0.4s; }
+}
